@@ -1,0 +1,16 @@
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: grey;
+}
+.container{
+    width: 450px;
+    height: 450px;
+    border-radius: 25px;
+    background-color: #ffff;
+}
+.container img{
+ border-radius: 25px;
+}

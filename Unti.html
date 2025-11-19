@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Game Bola Sederhana</title>
+<style>
+    body { margin: 0; overflow: hidden; background: #0a0a0a; }
+    canvas { background: green; display: block; margin: 0 auto; }
+    #score {
+        position: fixed;
+        color: white;
+        left: 20px;
+        top: 20px;
+        font-size: 24px;
+        font-family: Arial;
+    }
+</style>
+</head>
+<body>
+
+<div id="score">Kiri: 0 | Kanan: 0</div>
+<canvas id="game" width="1000" height="600"></canvas>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+// =========================== DATA GAME =============================
+let scoreLeft = 0;
+let scoreRight = 0;
+
+let player = {
+    x: 500,
+    y: 300,
+    radius: 20,
+    speed: 4,
+    color: "blue"
+};
+
+let ball = {
+    x: 500,
+    y: 300,
+    radius: 12,
+    dx: 0,
+    dy: 0,
+    friction: 0.98
+};
+
+// =========================== KONTROL ===============================
+let keys = {};
+document.addEventListener("keydown", (e) => keys[e.code] = true);
+document.addEventListener("keyup", (e) => keys[e.code] = false);
+
+// Tombol tendang bola = Space
+function kickBall() {
+    let angle = Math.atan2(ball.y - player.y, ball.x - player.x);
+    ball.dx = Math.cos(angle) * 8;
+    ball.dy = Math.sin(angle) * 8;
+}
+
+// =========================== UPDATE ================================
+function update() {
+
+    // --- GERAKKAN PEMAIN ---
+    if (keys["KeyW"]) player.y -= player.speed;
+    if (keys["KeyS"]) player.y += player.speed;
+    if (keys["KeyA"]) player.x -= player.speed;
+    if (keys["KeyD"]) player.x += player.speed;
+
+    // --- TENDANG BOLA ---
+    if (keys["Space"]) kickBall();
+
+    // --- UPDATE BOLA ---
+    ball.x += ball.dx;
+    ball.y += ball.dy;
+
+    // Bola melambat
+    ball.dx *= ball.friction;
+    ball.dy *= ball.friction;
+
+    // --- TABRAKAN PEMAIN-BOLA ---
+    let dist = Math.hypot(player.x - ball.x, player.y - ball.y);
+    if (dist < player.radius + ball.radius) {
+        let angle = Math.atan2(ball.y - player.y, ball.x - player.x);
+        ball.dx = Math.cos(angle) * 5;
+        ball.dy = Math.sin(angle) * 5;
+    }
+
+    // --- BATAS LAPANGAN ---
+    if (ball.x < ball.radius) ball.x = ball.radius;
+    if (ball.x > canvas.width - ball.radius) ball.x = canvas.width - ball.radius;
+    if (ball.y < ball.radius) ball.y = ball.radius;
+    if (ball.y > canvas.height - ball.radius) ball.y = canvas.height - ball.radius;
+
+    // --- CEK GOL ---
+    if (ball.x < 30 && ball.y > 250 && ball.y < 350) {
+        scoreRight++;
+        resetBall();
+    }
+    if (ball.x > canvas.width - 30 && ball.y > 250 && ball.y < 350) {
+        scoreLeft++;
+        resetBall();
+    }
+
+    document.getElementById("score").innerHTML =
+        `Kiri: ${scoreLeft} | Kanan: ${scoreRight}`;
+}
+
+// =========================== RESET BOLA ============================
+function resetBall() {
+    ball.x = canvas.width / 2;
+    ball.y = canvas.height / 2;
+    ball.dx = 0;
+    ball.dy = 0;
+}
+
+// =========================== DRAW ================================
+function drawField() {
+    // Garis tengah
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 4;
+
+    ctx.beginPath();
+    ctx.moveTo(canvas.width / 2, 0);
+    ctx.lineTo(canvas.width / 2, canvas.height);
+    ctx.stroke();
+
+    // Lingkaran tengah
+    ctx.beginPath();
+    ctx.arc(canvas.width / 2, canvas.height / 2, 80, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Gawang kiri
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 250, 10, 100);
+
+    // Gawang kanan
+    ctx.fillRect(canvas.width - 10, 250, 10, 100);
+}
+
+function drawPlayer() {
+    ctx.fillStyle = player.color;
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+function drawBall() {
+    ctx.fillStyle = "white";
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+// =========================== GAME LOOP ============================
+function gameLoop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawField();
+    update();
+    drawPlayer();
+    drawBall();
+
+    requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+</script>
+
+</body>
+</html>

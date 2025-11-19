@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Simple FPS</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-family: Arial;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">Klik untuk mulai, WASD = jalan, Mouse = lihat, Klik = tembak</div>
+
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        let scene, camera, renderer;
+        let controlsEnabled = false;
+        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+        let velocity = new THREE.Vector3();
+        let direction = new THREE.Vector3();
+
+        init();
+        animate();
+
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x222222);
+
+            // Kamera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+            // Render
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            // Lantai
+            let floorGeo = new THREE.PlaneGeometry(200, 200);
+            let floorMat = new THREE.MeshBasicMaterial({ color: 0x444444 });
+            let floor = new THREE.Mesh(floorGeo, floorMat);
+            floor.rotation.x = -Math.PI / 2;
+            scene.add(floor);
+
+            // Cube target
+            target = new THREE.Mesh(
+                new THREE.BoxGeometry(1, 1, 1),
+                new THREE.MeshBasicMaterial({ color: 0xff0000 })
+            );
+            target.position.set(0, 1, -10);
+            scene.add(target);
+
+            // Pointer lock
+            document.body.addEventListener('click', () => {
+                document.body.requestPointerLock();
+            });
+
+            document.addEventListener('pointerlockchange', () => {
+                controlsEnabled = document.pointerLockElement === document.body;
+            });
+
+            // Mouse look
+            document.addEventListener('mousemove', (e) => {
+                if (!controlsEnabled) return;
+                camera.rotation.y -= e.movementX * 0.002;
+                camera.rotation.x -= e.movementY * 0.002;
+                camera.rotation.x = Math.max(-1.5, Math.min(1.5, camera.rotation.x));
+            });
+
+            // Gerakan keyboard
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'KeyW') moveForward = true;
+                if (e.code === 'KeyS') moveBackward = true;
+                if (e.code === 'KeyA') moveLeft = true;
+                if (e.code === 'KeyD') moveRight = true;
+            });
+
+            document.addEventListener('keyup', (e) => {
+                if (e.code === 'KeyW') moveForward = false;
+                if (e.code === 'KeyS') moveBackward = false;
+                if (e.code === 'KeyA') moveLeft = false;
+                if (e.code === 'KeyD') moveRight = false;
+            });
+
+            // Menembak
+            document.addEventListener('click', () => {
+                if (!controlsEnabled) return;
+
+                let raycaster = new THREE.Raycaster();
+                raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+                let hits = raycaster.intersectObject(target);
+
+                if (hits.length > 0) {
+                    target.material.color.set(0x00ff00); // kena!
+                    setTimeout(() => target.material.color.set(0xff0000), 200);
+                }
+            });
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (controlsEnabled) {
+                velocity.set(0, 0, 0);
+
+                direction.z = Number(moveForward) - Number(moveBackward);
+                direction.x = Number(moveRight) - Number(moveLeft);
+                direction.normalize();
+
+                let speed = 0.1;
+
+                if (moveForward || moveBackward) velocity.z = direction.z * speed;
+                if (moveLeft || moveRight) velocity.x = direction.x * speed;
+
+                let sinY = Math.sin(camera.rotation.y);
+                let cosY = Math.cos(camera.rotation.y);
+
+                camera.position.x += velocity.x * cosY - velocity.z * sinY;
+                camera.position.z += velocity.z * cosY + velocity.x * sinY;
+            }
+
+            renderer.render(scene, camera);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Anime Logo - Honkai Star Rail Style</title>
+<style>
+body {
+    background: linear-gradient(#0d0d20, #13132d);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+}
+
+/* ANIME PARTICLES */
+@keyframes sparkle {
+    0% { opacity: 0; transform: scale(0.5) translateY(0px); }
+    50% { opacity: 1; transform: scale(1) translateY(-20px);}
+    100% { opacity: 0; transform: scale(0.5) translateY(0px);}
+}
+
+.particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #9bddff;
+    border-radius: 50%;
+    animation: sparkle 2s infinite ease-in-out;
+}
+.p1 { left: 40%; top: 20%; animation-delay: 0s; }
+.p2 { left: 60%; top: 25%; animation-delay: .3s; }
+.p3 { left: 50%; top: 60%; animation-delay: .7s; }
+.p4 { left: 35%; top: 70%; animation-delay: 1s; }
+
+/* Container logo */
+.logo-container {
+    position: relative;
+    width: 420px;
+    height: 420px;
+}
+
+/* Anime glowing circle */
+.circle {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 40%, 
+        #7fd4ff 0%, 
+        #3a7fff 25%,
+        #1a1e4a 70%, 
+        #0b0c1f 100%);
+    box-shadow:
+        0 0 50px #5dbdff,
+        0 0 90px rgba(120,180,255,0.6),
+        inset 0 0 40px #5dbdff;
+}
+
+/* Orbit anime */
+.orbit {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 480px;
+    height: 160px;
+    border: 4px solid rgba(255,255,255,0.4);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) rotate(-20deg);
+    filter: drop-shadow(0 0 20px #85c9ff);
+}
+
+/* Shiny meteor */
+.meteor {
+    position: absolute;
+    top: 20%;
+    right: -20px;
+    width: 120px;
+    height: 4px;
+    background: linear-gradient(to left, #fff, rgba(255,255,255,0));
+    transform: rotate(-25deg);
+    box-shadow: 0 0 20px #fff;
+    animation: dash 2.2s infinite ease-in-out;
+}
+@keyframes dash {
+    0%   { opacity: 0; right: -40px; }
+    40%  { opacity: 1; right: 80px; }
+    100% { opacity: 0; right: 200px; }
+}
+
+/* Floating star */
+.star {
+    position: absolute;
+    width: 55px;
+    height: 55px;
+    background: linear-gradient(45deg, #fff, #b3dfff);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 
+                       68% 57%, 79% 91%, 50% 70%, 
+                       21% 91%, 32% 57%, 2% 35%, 
+                       39% 35%);
+    top: 50%;
+    left: 25%;
+    transform: translate(-50%, -50%) rotate(8deg);
+    filter: drop-shadow(0 0 20px #b3e0ff);
+    animation: pulse 3s infinite ease-in-out;
+}
+@keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.25); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Teks anime */
+.text {
+    position: absolute;
+    bottom: -40px;
+    width: 100%;
+    text-align: center;
+    font-size: 42px;
+    letter-spacing: 3px;
+    font-weight: 900;
+    color: #ffffff;
+    text-shadow:
+        0 0 10px #6bbcff,
+        0 0 20px #a4d7ff,
+        0 0 35px #6bbcff,
+        0 0 55px #a4d7ff;
+}
+
+.subtext {
+    font-size: 20px;
+    letter-spacing: 4px;
+    opacity: 0.9;
+}
+</style>
+</head>
+<body>
+
+<div class="particle p1"></div>
+<div class="particle p2"></div>
+<div class="particle p3"></div>
+<div class="particle p4"></div>
+
+<div class="logo-container">
+    <div class="circle"></div>
+    <div class="orbit"></div>
+    <div class="meteor"></div>
+    <div class="star"></div>
+
+    <div class="text">
+        HONKAI <span style="color:#89cfff;">STAR RAIL</span>
+        <div class="subtext">ANIME EDITION</div>
+    </div>
+</div>
+
+</body>
+</html>

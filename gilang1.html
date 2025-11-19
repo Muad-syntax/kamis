@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Game Cacing HTML</title>
+<style>
+    body { margin: 0; overflow: hidden; background: #111; }
+    canvas { background: #222; display: block; margin: 0 auto; }
+</style>
+</head>
+<body>
+
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+// ===== GAME DATA =====
+let snake = [{ x: 400, y: 300 }];
+let snakeLength = 50;
+let speed = 2.5;
+let angle = 0;
+
+// Mouse position
+let mouseX = 400, mouseY = 300;
+
+// Food
+let food = { x: Math.random()*800, y: Math.random()*600 };
+
+// ===== INPUT: MOUSE =====
+document.addEventListener("mousemove", (e) => {
+    const rect = canvas.getBoundingClientRect();
+    mouseX = e.clientX - rect.left;
+    mouseY = e.clientY - rect.top;
+});
+
+// ===== INPUT: KEYBOARD =====
+document.addEventListener("keydown", (e) => {
+    if (e.code === "ArrowLeft") angle -= 0.2;
+    if (e.code === "ArrowRight") angle += 0.2;
+    if (e.code === "ArrowUp") speed += 0.3;
+    if (e.code === "ArrowDown") speed = Math.max(1, speed - 0.3);
+});
+
+// ===== DRAW SNAKE =====
+function drawSnake() {
+    ctx.lineWidth = 15;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#00ff88";
+
+    ctx.beginPath();
+    ctx.moveTo(snake[0].x, snake[0].y);
+    for (let i = 1; i < snake.length; i++) {
+        ctx.lineTo(snake[i].x, snake[i].y);
+    }
+    ctx.stroke();
+}
+
+// ===== DRAW FOOD =====
+function drawFood() {
+    ctx.fillStyle = "red";
+    ctx.beginPath();
+    ctx.arc(food.x, food.y, 8, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+// ===== UPDATE GAME =====
+function update() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Auto turn toward mouse
+    let dx = mouseX - snake[0].x;
+    let dy = mouseY - snake[0].y;
+    angle = Math.atan2(dy, dx);
+
+    // Move head
+    let newHead = {
+        x: snake[0].x + Math.cos(angle) * speed,
+        y: snake[0].y + Math.sin(angle) * speed
+    };
+    snake.unshift(newHead);
+
+    // Keep snake length
+    while (snake.length > snakeLength) snake.pop();
+
+    // Collision with food
+    let dist = Math.hypot(newHead.x - food.x, newHead.y - food.y);
+    if (dist < 15) {
+        snakeLength += 20; // grow
+        food.x = Math.random() * canvas.width;
+        food.y = Math.random() * canvas.height;
+    }
+
+    drawFood();
+    drawSnake();
+
+    requestAnimationFrame(update);
+}
+
+update();
+</script>
+
+</body>
+</html>

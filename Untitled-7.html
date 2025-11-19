@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>STAR DASH - Simple HTML Game</title>
+<style>
+    body {
+        background: linear-gradient(#050518, #0b0b30);
+        margin: 0;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+    }
+
+    #game {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    /* Player */
+    #player {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        background: cyan;
+        border-radius: 50%;
+        left: 50%;
+        bottom: 20px;
+        transform: translateX(-50%);
+        box-shadow: 0 0 20px cyan;
+    }
+
+    /* Meteor */
+    .meteor {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        background: orange;
+        border-radius: 50%;
+        box-shadow: 0 0 20px orange;
+    }
+
+    #score {
+        position: absolute;
+        top: 15px;
+        left: 20px;
+        font-size: 28px;
+        color: white;
+        text-shadow: 0 0 10px #79cfff;
+    }
+</style>
+</head>
+<body>
+
+<div id="game">
+    <div id="player"></div>
+    <div id="score">Score: 0</div>
+</div>
+
+<script>
+const game = document.getElementById("game");
+const player = document.getElementById("player");
+const scoreText = document.getElementById("score");
+
+let score = 0;
+let playerX = window.innerWidth / 2;
+
+/* Player movement */
+document.addEventListener("mousemove", (e) => {
+    playerX = e.clientX - 30;
+    player.style.left = playerX + "px";
+});
+
+/* Create meteors */
+function spawnMeteor() {
+    const meteor = document.createElement("div");
+    meteor.classList.add("meteor");
+
+    let x = Math.random() * window.innerWidth;
+    meteor.style.left = x + "px";
+    meteor.style.top = "-60px";
+
+    game.appendChild(meteor);
+
+    let fallSpeed = 3 + Math.random() * 5;
+
+    function fall() {
+        let top = parseFloat(meteor.style.top);
+        meteor.style.top = top + fallSpeed + "px";
+
+        // Collision detection
+        let p = player.getBoundingClientRect();
+        let m = meteor.getBoundingClientRect();
+
+        if (!(m.right < p.left || 
+              m.left > p.right || 
+              m.bottom < p.top || 
+              m.top > p.bottom)) 
+        {
+            alert("GAME OVER!\nScore: " + score);
+            location.reload();
+        }
+
+        // Remove meteor
+        if (top < window.innerHeight) {
+            requestAnimationFrame(fall);
+        } else {
+            meteor.remove();
+            score++;
+            scoreText.textContent = "Score: " + score;
+        }
+    }
+
+    fall();
+}
+
+/* Spawn meteors repeatedly */
+setInterval(spawnMeteor, 900);
+</script>
+
+</body>
+</html>

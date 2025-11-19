@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Game Bola HTML</title>
+<style>
+    body { margin: 0; overflow: hidden; background: #111; }
+    canvas { background: #222; display: block; margin: 0 auto; }
+</style>
+</head>
+<body>
+
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+
+<script>
+// Canvas setup
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+// BALL DATA
+let ball = {
+    x: 400,
+    y: 300,
+    radius: 20,
+    dx: 3,
+    dy: 3,
+    speed: 3
+};
+
+// INPUT KEYBOARD
+let keys = {};
+document.addEventListener("keydown", (e) => keys[e.code] = true);
+document.addEventListener("keyup", (e) => keys[e.code] = false);
+
+// INPUT MOUSE
+let mouseX = 400, mouseY = 300;
+document.addEventListener("mousemove", (e) => {
+    const rect = canvas.getBoundingClientRect();
+    mouseX = e.clientX - rect.left;
+    mouseY = e.clientY - rect.top;
+});
+
+// DRAW BALL
+function drawBall() {
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+    ctx.fillStyle = "#00aaff";
+    ctx.fill();
+}
+
+// UPDATE GAME
+function update() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // === KEYBOARD CONTROL ===
+    if (keys["ArrowLeft"])  ball.x -= ball.speed;
+    if (keys["ArrowRight"]) ball.x += ball.speed;
+    if (keys["ArrowUp"])    ball.y -= ball.speed;
+    if (keys["ArrowDown"])  ball.y += ball.speed;
+
+    // === MOUSE FOLLOW (LEMBUT) ===
+    let mx = mouseX - ball.x;
+    let my = mouseY - ball.y;
+
+    ball.x += mx * 0.02;
+    ball.y += my * 0.02;
+
+    // === WALL BOUNCE ===
+    if (ball.x < ball.radius)  ball.x = ball.radius;
+    if (ball.x > canvas.width - ball.radius) ball.x = canvas.width - ball.radius;
+
+    if (ball.y < ball.radius) ball.y = ball.radius;
+    if (ball.y > canvas.height - ball.radius) ball.y = canvas.height - ball.radius;
+
+    drawBall();
+    requestAnimationFrame(update);
+}
+
+update();
+</script>
+
+</body>
+</html>
